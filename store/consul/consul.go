@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/docker/libkv"
-	"github.com/docker/libkv/store"
+	"github.com/shipdock/libkv"
+	"github.com/shipdock/libkv/store"
 	api "github.com/hashicorp/consul/api"
 )
 
@@ -237,7 +237,7 @@ func (s *Consul) Exists(key string) (bool, error) {
 }
 
 // List child nodes of a given directory
-func (s *Consul) List(directory string) ([]*store.KVPair, error) {
+func (s *Consul) List(directory string, recursive bool) ([]*store.KVPair, error) {
 	pairs, _, err := s.client.KV().List(s.normalize(directory), nil)
 	if err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ func (s *Consul) List(directory string) ([]*store.KVPair, error) {
 
 // DeleteTree deletes a range of keys under a given directory
 func (s *Consul) DeleteTree(directory string) error {
-	if _, err := s.List(directory); err != nil {
+	if _, err := s.List(directory, false); err != nil {
 		return err
 	}
 	_, err := s.client.KV().DeleteTree(s.normalize(directory), nil)

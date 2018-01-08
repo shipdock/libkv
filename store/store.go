@@ -88,7 +88,7 @@ type Store interface {
 	NewLock(key string, options *LockOptions) (Locker, error)
 
 	// List the content of a given prefix
-	List(directory string) ([]*KVPair, error)
+	List(directory string, recursive bool) ([]*KVPair, error)
 
 	// DeleteTree deletes a range of keys under a given directory
 	DeleteTree(directory string) error

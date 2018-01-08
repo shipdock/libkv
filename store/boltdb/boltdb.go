@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/docker/libkv"
-	"github.com/docker/libkv/store"
+	"github.com/shipdock/libkv"
+	"github.com/shipdock/libkv/store"
 )
 
 var (
@@ -261,7 +261,7 @@ func (b *BoltDB) Exists(key string) (bool, error) {
 }
 
 // List returns the range of keys starting with the passed in prefix
-func (b *BoltDB) List(keyPrefix string) ([]*store.KVPair, error) {
+func (b *BoltDB) List(keyPrefix string, recursive bool) ([]*store.KVPair, error) {
 	var (
 		db  *bolt.DB
 		err error

@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/libkv"
-	"github.com/docker/libkv/store"
+	"github.com/shipdock/libkv"
+	"github.com/shipdock/libkv/store"
 	zk "github.com/samuel/go-zookeeper/zk"
 )
 
@@ -198,7 +198,7 @@ func (s *Zookeeper) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVP
 // be used to stop watching.
 func (s *Zookeeper) WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*store.KVPair, error) {
 	// List the childrens first
-	entries, err := s.List(directory)
+	entries, err := s.List(directory, false)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +221,7 @@ func (s *Zookeeper) WatchTree(directory string, stopCh <-chan struct{}) (<-chan 
 			select {
 			case e := <-eventCh:
 				if e.Type == zk.EventNodeChildrenChanged {
-					if kv, err := s.List(directory); err == nil {
+					if kv, err := s.List(directory, false); err == nil {
 						watchCh <- kv
 					}
 				}
@@ -236,7 +236,7 @@ func (s *Zookeeper) WatchTree(directory string, stopCh <-chan struct{}) (<-chan 
 }
 
 // List child nodes of a given directory
-func (s *Zookeeper) List(directory string) ([]*store.KVPair, error) {
+func (s *Zookeeper) List(directory string, recursive bool) ([]*store.KVPair, error) {
 	keys, stat, err := s.client.Children(s.normalize(directory))
 	if err != nil {
 		if err == zk.ErrNoNode {
@@ -253,7 +253,7 @@ func (s *Zookeeper) List(directory string) ([]*store.KVPair, error) {
 		if err != nil {
 			// If node is not found: List is out of date, retry
 			if err == store.ErrKeyNotFound {
-				return s.List(directory)
+				return s.List(directory, false)
 			}
 			return nil, err
 		}
@@ -270,7 +270,7 @@ func (s *Zookeeper) List(directory string) ([]*store.KVPair, error) {
 
 // DeleteTree deletes a range of keys under a given directory
 func (s *Zookeeper) DeleteTree(directory string) error {
-	pairs, err := s.List(directory)
+	pairs, err := s.List(directory, false)
 	if err != nil {
 		return err
 	}

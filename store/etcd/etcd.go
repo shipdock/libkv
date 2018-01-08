@@ -11,8 +11,8 @@ import (
 	"time"
 
 	etcd "github.com/coreos/etcd/client"
-	"github.com/docker/libkv"
-	"github.com/docker/libkv/store"
+	"github.com/shipdock/libkv"
+	"github.com/shipdock/libkv/store"
 )
 
 var (
@@ -292,7 +292,7 @@ func (s *Etcd) WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*st
 		defer close(watchCh)
 
 		// Get child values
-		list, err := s.List(directory)
+		list, err := s.List(directory, false)
 		if err != nil {
 			return
 		}
@@ -314,7 +314,7 @@ func (s *Etcd) WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*st
 				return
 			}
 
-			list, err = s.List(directory)
+			list, err = s.List(directory, false)
 			if err != nil {
 				return
 			}
@@ -412,11 +412,10 @@ func (s *Etcd) AtomicDelete(key string, previous *store.KVPair) (bool, error) {
 }
 
 // List child nodes of a given directory
-func (s *Etcd) List(directory string) ([]*store.KVPair, error) {
-	var dumpNode func(node *etcd.Node) []*store.KVPair
+func (s *Etcd) List(directory string, recursive bool) ([]*store.KVPair, error) {
 	getOpts := &etcd.GetOptions{
 		Quorum:    true,
-		Recursive: true,
+		Recursive: recursive,
 		Sort:      true,
 	}
 
@@ -427,6 +426,18 @@ func (s *Etcd) List(directory string) ([]*store.KVPair, error) {
 		}
 		return nil, err
 	}
+	if recursive == false {
+		kv := []*store.KVPair{}
+		for _, n := range resp.Node.Nodes {
+			kv = append(kv, &store.KVPair{
+				Key:       n.Key,
+				Value:     []byte(n.Value),
+				LastIndex: n.ModifiedIndex,
+			})
+		}
+		return kv, nil
+	}
+	var dumpNode func(node *etcd.Node) []*store.KVPair
 	dumpNode = func(node *etcd.Node) []*store.KVPair {
 		kv := []*store.KVPair{}
 		if node != resp.Node {
