@@ -232,8 +232,8 @@ func (s *Etcd) Exists(key string) (bool, error) {
 // on errors. Upon creation, the current value will first
 // be sent to the channel. Providing a non-nil stopCh can
 // be used to stop watching.
-func (s *Etcd) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
-	opts := &etcd.WatcherOptions{Recursive: false}
+func (s *Etcd) Watch(key string, stopCh <-chan struct{}, recursive bool) (<-chan *store.KVPair, error) {
+	opts := &etcd.WatcherOptions{Recursive: recursive}
 	watcher := s.client.Watcher(s.normalize(key), opts)
 
 	// watchCh is sending back events to the caller
@@ -269,6 +269,8 @@ func (s *Etcd) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, 
 				Key:       key,
 				Value:     []byte(result.Node.Value),
 				LastIndex: result.Node.ModifiedIndex,
+				Action:    result.Action,
+				IsDir:	   result.Node.Dir,
 			}
 		}
 	}()

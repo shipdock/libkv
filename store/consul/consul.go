@@ -276,7 +276,7 @@ func (s *Consul) DeleteTree(directory string) error {
 // on errors. Upon creation, the current value will first
 // be sent to the channel. Providing a non-nil stopCh can
 // be used to stop watching.
-func (s *Consul) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
+func (s *Consul) Watch(key string, stopCh <-chan struct{}, recursive bool) (<-chan *store.KVPair, error) {
 	kv := s.client.KV()
 	watchCh := make(chan *store.KVPair)
 

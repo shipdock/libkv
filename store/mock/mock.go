@@ -49,7 +49,7 @@ func (s *Mock) Exists(key string) (bool, error) {
 }
 
 // Watch mock
-func (s *Mock) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
+func (s *Mock) Watch(key string, stopCh <-chan struct{}, recursive bool) (<-chan *store.KVPair, error) {
 	args := s.Mock.Called(key, stopCh)
 	return args.Get(0).(<-chan *store.KVPair), args.Error(1)
 }
