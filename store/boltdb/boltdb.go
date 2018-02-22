@@ -464,7 +464,7 @@ func (b *BoltDB) NewLock(key string, options *store.LockOptions) (store.Locker, 
 }
 
 // Watch has to implemented at the library level since its not supported by BoltDB
-func (b *BoltDB) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
+func (b *BoltDB) Watch(key string, stopCh <-chan struct{}, recursive bool) (<-chan *store.KVPair, error) {
 	return nil, store.ErrCallNotSupported
 }
 

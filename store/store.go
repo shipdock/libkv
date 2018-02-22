@@ -76,7 +76,7 @@ type Store interface {
 	Exists(key string) (bool, error)
 
 	// Watch for changes on a key
-	Watch(key string, stopCh <-chan struct{}) (<-chan *KVPair, error)
+	Watch(key string, stopCh <-chan struct{}, recursive bool) (<-chan *KVPair, error)
 
 	// WatchTree watches for changes on child nodes under
 	// a given directory
@@ -109,6 +109,8 @@ type KVPair struct {
 	Key       string
 	Value     []byte
 	LastIndex uint64
+	Action	  string
+	IsDir	  bool
 }
 
 // WriteOptions contains optional request parameters

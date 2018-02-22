@@ -154,7 +154,7 @@ func (s *Zookeeper) Exists(key string) (bool, error) {
 // on errors. Upon creation, the current value will first
 // be sent to the channel. Providing a non-nil stopCh can
 // be used to stop watching.
-func (s *Zookeeper) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
+func (s *Zookeeper) Watch(key string, stopCh <-chan struct{}, recursive bool) (<-chan *store.KVPair, error) {
 	// Get the key first
 	pair, err := s.Get(key)
 	if err != nil {
