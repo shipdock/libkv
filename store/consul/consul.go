@@ -262,6 +262,10 @@ func (s *Consul) List(directory string, recursive bool) ([]*store.KVPair, error)
 	return kv, nil
 }
 
+func (s *Consul) ListWithTTL(directory string, recursive bool) ([]*store.KVPair, error) {
+	return nil, store.ErrCallNotSupported
+}
+
 // DeleteTree deletes a range of keys under a given directory
 func (s *Consul) DeleteTree(directory string) error {
 	if _, err := s.List(directory, false); err != nil {

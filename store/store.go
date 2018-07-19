@@ -90,6 +90,9 @@ type Store interface {
 	// List the content of a given prefix
 	List(directory string, recursive bool) ([]*KVPair, error)
 
+	// List with ttl the content of a given prefix
+	ListWithTTL(directory string, recursive bool) ([]*KVPair, error)
+
 	// DeleteTree deletes a range of keys under a given directory
 	DeleteTree(directory string) error
 

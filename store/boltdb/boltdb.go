@@ -472,3 +472,7 @@ func (b *BoltDB) Watch(key string, stopCh <-chan struct{}, recursive bool) (<-ch
 func (b *BoltDB) WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*store.KVPair, error) {
 	return nil, store.ErrCallNotSupported
 }
+
+func (b *BoltDB) ListWithTTL(keyPrefix string, recursive bool) ([]*store.KVPair, error) {
+	return nil, store.ErrCallNotSupported
+}
