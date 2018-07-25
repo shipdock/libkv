@@ -114,6 +114,7 @@ type KVPair struct {
 	LastIndex uint64
 	Action	  string
 	IsDir	  bool
+	TTL		  int64
 }
 
 // WriteOptions contains optional request parameters
