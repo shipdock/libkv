@@ -268,6 +268,10 @@ func (s *Zookeeper) List(directory string, recursive bool) ([]*store.KVPair, err
 	return kv, nil
 }
 
+func (s *Zookeeper) ListWithTTL(directory string, recursive bool) ([]*store.KVPair, error) {
+	return nil, store.ErrCallNotSupported
+}
+
 // DeleteTree deletes a range of keys under a given directory
 func (s *Zookeeper) DeleteTree(directory string) error {
 	pairs, err := s.List(directory, false)

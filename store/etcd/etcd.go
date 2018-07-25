@@ -457,6 +457,50 @@ func (s *Etcd) List(directory string, recursive bool) ([]*store.KVPair, error) {
 	return dumpNode(resp.Node), nil
 }
 
+func (s *Etcd) ListWithTTL(directory string, recursive bool) ([]*store.KVPair, error) {
+	getOpts := &etcd.GetOptions{
+		Quorum:    false,
+		Recursive: recursive,
+		Sort:      false,
+	}
+
+	resp, err := s.client.Get(context.Background(), s.normalize(directory), getOpts)
+	if err != nil {
+		if keyNotFound(err) {
+			return nil, store.ErrKeyNotFound
+		}
+		return nil, err
+	}
+	if recursive == false {
+		kv := []*store.KVPair{}
+		for _, n := range resp.Node.Nodes {
+			kv = append(kv, &store.KVPair{
+				Key:       n.Key,
+				Value:     []byte(n.Value),
+				LastIndex: n.ModifiedIndex,
+			})
+		}
+		return kv, nil
+	}
+	var dumpNode func(node *etcd.Node) []*store.KVPair
+	dumpNode = func(node *etcd.Node) []*store.KVPair {
+		kv := []*store.KVPair{}
+		if node != resp.Node {
+			kv = append(kv, &store.KVPair{
+				Key:       strings.TrimPrefix(node.Key, "/"),
+				Value:     []byte(node.Value),
+				TTL:	   node.TTL,
+				LastIndex: node.ModifiedIndex,
+			})
+		}
+		for _, v := range node.Nodes {
+			kv = append(kv, dumpNode(v)...)
+		}
+		return kv
+	}
+	return dumpNode(resp.Node), nil
+}
+
 // DeleteTree deletes a range of keys under a given directory
 func (s *Etcd) DeleteTree(directory string) error {
 	delOpts := &etcd.DeleteOptions{
